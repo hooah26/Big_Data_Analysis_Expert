@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 
 df = sns.load_dataset('titanic')
 # print(df)
-X_train, X_test, Y_train, Y_test = train_test_split(df, df['survived'], test_size=0.2, random_state=42,
+X_train, X_test, y_train, y_test = train_test_split(df, df['survived'], test_size=0.2, random_state=42,
                                                     stratify=df['survived'])
 X_train = X_train.drop(['alive', 'survived'], axis=1)
 X_test = X_test.drop(['alive', 'survived'], axis=1)
@@ -72,8 +72,8 @@ X_test[scaler] = min.transform(X_test[scaler])
 
 
 # 6.데이터분리
-X_train, X_valid, Y_train, Y_valid = train_test_split(X_train, Y_train, test_size=0.2, random_state=42,
-                                                      stratify=Y_train)
+X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size=0.2, random_state=42,
+                                                      stratify=y_train)
 # print(X_train.shape)
 # print(X_valid.shape)
 
@@ -82,19 +82,19 @@ X_train, X_valid, Y_train, Y_valid = train_test_split(X_train, Y_train, test_siz
 from sklearn.linear_model import LogisticRegression
 
 model1 = LogisticRegression()
-model1.fit(X_train, Y_train)
+model1.fit(X_train, y_train)
 pred1 = pd.DataFrame(model1.predict_proba(X_valid))
 
 from sklearn.ensemble import RandomForestClassifier
 
 model2 = RandomForestClassifier()
-model2.fit(X_train, Y_train)
+model2.fit(X_train, y_train)
 pred2 = pd.DataFrame(model2.predict_proba(X_valid))
 
 from sklearn.ensemble import VotingClassifier
 
 model3 = VotingClassifier(estimators=[('logistic', model1), ('random', model2)], voting='soft')
-model3.fit(X_train, Y_train)
+model3.fit(X_train, y_train)
 pred3 = pd.DataFrame(model3.predict_proba(X_valid))
 
 # print(pred3)
@@ -102,11 +102,11 @@ pred3 = pd.DataFrame(model3.predict_proba(X_valid))
 
 from sklearn.metrics import roc_auc_score
 
-# print('Y_valid',Y_valid)
+# print('y_valid',y_valid)
 # print('pred1',pred1)
-print('로지스틱', roc_auc_score(Y_valid, pred1.iloc[:, 1]))
-print('랜포', roc_auc_score(Y_valid, pred2.iloc[:, 1]))
-print('보팅', roc_auc_score(Y_valid, pred3.iloc[:, 1]))
+print('로지스틱', roc_auc_score(y_valid, pred1.iloc[:, 1]))
+print('랜포', roc_auc_score(y_valid, pred2.iloc[:, 1]))
+print('보팅', roc_auc_score(y_valid, pred3.iloc[:, 1]))
 
 # 9.하이퍼 파라미터 튜닝
 from sklearn.model_selection import GridSearchCV
@@ -114,7 +114,7 @@ from sklearn.model_selection import GridSearchCV
 parameters = {'n_estimators': [50, 100], 'max_depth': [4, 6]}
 model5 = RandomForestClassifier()
 clf = GridSearchCV(estimator=model5, param_grid=parameters, cv=3)
-clf.fit(X_train, Y_train)
+clf.fit(X_train, y_train)
 print('최적의 파라미터', clf.best_params_)
 
 # 10.파일저장
